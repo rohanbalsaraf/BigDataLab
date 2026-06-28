@@ -40,13 +40,11 @@ service ssh start
 service postgresql start
 
 
-# 4b. Start and configure MySQL
-service mysql start
+# 4b. Start and configure MariaDB
+service mariadb start
 chmod 755 /var/run/mysqld
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'cloudera';" || true
-mysql -e "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'cloudera';" || true
-mysql -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'cloudera';" || true
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;" || true
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'cloudera';" || true
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'cloudera' WITH GRANT OPTION; FLUSH PRIVILEGES;" || true
 
 # Initialize sample database and table for Sqoop import tests
 mysql -u root -pcloudera -e "

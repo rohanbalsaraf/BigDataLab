@@ -11,11 +11,11 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     sudo \
     postgresql postgresql-contrib \
-    mysql-server \
+    mariadb-server mariadb-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Configure MySQL to listen on all interfaces
-RUN sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+# Configure MariaDB to listen on all interfaces
+RUN sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
 
 
 # 2. Set Environment Variables

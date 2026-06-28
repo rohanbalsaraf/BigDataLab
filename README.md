@@ -78,6 +78,45 @@ docker run -d \
 
 ---
 
+## ⚙️ Resource Allocation (CPU & Memory)
+
+You can customize the CPU and memory limits allocated to the sandbox depending on your host machine's capabilities.
+
+### 1. Memory Profiles & Limits
+
+Memory allocation is controlled via the `HARDWARE_PROFILE` and `DOCKER_MEM_LIMIT` variables in the `.env` file. These dynamically configure both the Docker container limits and the internal JVM heaps for services (Hadoop, Cassandra, Hive).
+
+| Setting | Type / Option | Default | Minimum | Maximum / Recommended | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`HARDWARE_PROFILE`** | String option | `MINIMAL` | `MINIMAL` | `PERFORMANCE` | Set to `MINIMAL` (4G host), `BALANCED` (8G-16G host), or `PERFORMANCE` (16G+ host). |
+| **`DOCKER_MEM_LIMIT`** | Memory string | `4G` | `4G` | No upper limit (e.g. `16G`, `32G`) | Caps the total physical memory allocated to the container. |
+
+#### Internal Heap Allocations by Profile:
+* **`MINIMAL`** (Default): Hadoop Heap: `256m`, Cassandra Heap: `256M` (Requires min `4G` Docker Mem Limit)
+* **`BALANCED`**: Hadoop Heap: `1024m`, Cassandra Heap: `1024M` (Requires min `8G` Docker Mem Limit)
+* **`PERFORMANCE`**: Hadoop Heap: `4096m`, Cassandra Heap: `4096M` (Requires min `16G` Docker Mem Limit)
+
+---
+
+### 2. CPU Allocation
+
+By default, the sandbox has access to all CPU cores on the host machine. You can explicitly restrict CPU cores by editing the `deploy` resources block in [docker-compose.yml](file:///home/rohan/Projects/DATATOOLSSETUP/docker-compose.yml).
+
+| Setting | Default | Minimum | Maximum / Recommended | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **CPUs** | Unlimited (All cores) | `2.0` | Match all system cores (e.g., `8.0`) | Number of CPU cores allocated. A minimum of `2.0` is required for multi-threaded service JVMs to run stably. |
+
+#### Example (Limit to 4 CPU cores in `docker-compose.yml`):
+```yaml
+    deploy:
+      resources:
+        limits:
+          memory: ${DOCKER_MEM_LIMIT:-4G}
+          cpus: '4.0'
+```
+
+---
+
 ## 🔌 Connecting to the Sandbox
 
 ### 1. SSH Shell Access

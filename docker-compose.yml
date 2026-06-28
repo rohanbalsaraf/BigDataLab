@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  bigdata-sandbox:
+    image: minimal-bigdata
+    build: .
+    ports:
+      - "2222:22"
+      - "9870:9870"
+      - "8088:8088"
+      - "3307:3306"
+    environment:
+      - PROFILE=${HARDWARE_PROFILE:-MINIMAL}
+    volumes:
+      - hdfs-data:/tmp/hadoop-cloudera
+      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql
+      - cassandra-data:/opt/cassandra/data
+    deploy:
+      resources:
+        limits:
+          memory: ${DOCKER_MEM_LIMIT:-4G}
+
+volumes:
+  hdfs-data:
+  mysql-data:
+  postgres-data:
+  cassandra-data:

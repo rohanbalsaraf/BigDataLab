@@ -30,6 +30,10 @@ ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$HIVE_HOME/bin:$CASSANDRA_HOME
 # Export environment variables to system profile.d so they are loaded in all shells (including non-interactive su calls)
 RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' > /etc/profile.d/bigdata.sh && \
     echo 'export HADOOP_HOME=/opt/hadoop' >> /etc/profile.d/bigdata.sh && \
+    echo 'export HADOOP_COMMON_HOME=/opt/hadoop' >> /etc/profile.d/bigdata.sh && \
+    echo 'export HADOOP_HDFS_HOME=/opt/hadoop' >> /etc/profile.d/bigdata.sh && \
+    echo 'export HADOOP_MAPRED_HOME=/opt/hadoop' >> /etc/profile.d/bigdata.sh && \
+    echo 'export HADOOP_YARN_HOME=/opt/hadoop' >> /etc/profile.d/bigdata.sh && \
     echo 'export HIVE_HOME=/opt/hive' >> /etc/profile.d/bigdata.sh && \
     echo 'export CASSANDRA_HOME=/opt/cassandra' >> /etc/profile.d/bigdata.sh && \
     echo 'export SQOOP_HOME=/opt/sqoop' >> /etc/profile.d/bigdata.sh && \

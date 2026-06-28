@@ -27,10 +27,15 @@ fi
 
 # 2. Hadoop Memory Limits are applied dynamically via hadoop-env.sh using the HADOOP_HEAP variable
 export HADOOP_USER_NAME=${HADOOP_USER_NAME:-cloudera}
-echo "export HADOOP_USER_NAME=$HADOOP_USER_NAME" > /etc/profile.d/hadoop_user.sh
-
+{
+  echo "export HADOOP_USER_NAME=$HADOOP_USER_NAME"
+  echo "export HADOOP_HEAP=$HADOOP_HEAP"
+  echo "export MAX_HEAP_SIZE=$CASSANDRA_HEAP"
+  echo "export HEAP_NEWSIZE=$CASSANDRA_NEW"
+} > /etc/profile.d/hadoop_user.sh
 
 # Correct ownership of runtime mounted volumes (which might default to host root user)
+mkdir -p /tmp/hadoop-cloudera/hive
 chown -R cloudera:cloudera /tmp/hadoop-cloudera /opt/cassandra/data
 
 # 3. Apply Cassandra Memory Limits Dynamically
@@ -100,12 +105,11 @@ su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -mkdir -p
 su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/hive/warehouse"
 
 # 8. Start Hive Metastore as cloudera user
-export HADOOP_OPTS="-Xmx$HADOOP_HEAP $HADOOP_OPTS" # Cap Hive memory
-if [ ! -d "$HIVE_HOME/metastore_db" ]; then
+if [ ! -d "/tmp/hadoop-cloudera/hive/metastore_db" ]; then
   echo "Initializing Hive Metastore Schema..."
-  su - cloudera -c "cd $HIVE_HOME && ./bin/schematool -dbType derby -initSchema"
+  su - cloudera -c "cd \$HIVE_HOME && ./bin/schematool -dbType derby -initSchema"
 fi
-su - cloudera -c "nohup $HIVE_HOME/bin/hive --service metastore >/dev/null 2>&1 &"
+su - cloudera -c "HADOOP_OPTS=\"-Xmx$HADOOP_HEAP\" nohup \$HIVE_HOME/bin/hive --service metastore >/dev/null 2>&1 &"
 
 # 9. Keep container alive
 echo "Sandbox Ready. Profile: $PROFILE."

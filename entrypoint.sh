@@ -85,19 +85,19 @@ su - cloudera -c "$HADOOP_HOME/sbin/start-yarn.sh"
 
 # Wait for HDFS to exit safemode, force it to leave safemode, then create the default directories
 echo "Waiting for HDFS to start up..."
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfsadmin -safemode wait"
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfsadmin -safemode leave"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfsadmin -safemode wait"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfsadmin -safemode leave"
 echo "Creating default HDFS directory /user/$HADOOP_USER_NAME..."
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/$HADOOP_USER_NAME"
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chown -R $HADOOP_USER_NAME:$HADOOP_USER_NAME /user/$HADOOP_USER_NAME" || true
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/$HADOOP_USER_NAME"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/$HADOOP_USER_NAME"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -chown -R $HADOOP_USER_NAME:$HADOOP_USER_NAME /user/$HADOOP_USER_NAME" || true
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/$HADOOP_USER_NAME"
 if [ "$HADOOP_USER_NAME" != "cloudera" ]; then
-  su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/cloudera"
-  su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/cloudera"
+  su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/cloudera"
+  su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/cloudera"
 fi
 echo "Creating default Hive Warehouse directory /user/hive/warehouse..."
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/hive/warehouse"
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/hive/warehouse"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/hive/warehouse"
+su - cloudera -c "HADOOP_USER_NAME=cloudera \$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/hive/warehouse"
 
 # 8. Start Hive Metastore as cloudera user
 export HADOOP_OPTS="-Xmx$HADOOP_HEAP $HADOOP_OPTS" # Cap Hive memory

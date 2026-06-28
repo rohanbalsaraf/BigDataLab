@@ -26,6 +26,8 @@ else
 fi
 
 # 2. Hadoop Memory Limits are applied dynamically via hadoop-env.sh using the HADOOP_HEAP variable
+export HADOOP_USER_NAME=${HADOOP_USER_NAME:-cloudera}
+echo "export HADOOP_USER_NAME=$HADOOP_USER_NAME" > /etc/profile.d/hadoop_user.sh
 
 
 # Correct ownership of runtime mounted volumes (which might default to host root user)
@@ -85,8 +87,14 @@ su - cloudera -c "$HADOOP_HOME/sbin/start-yarn.sh"
 echo "Waiting for HDFS to start up..."
 su - cloudera -c "$HADOOP_HOME/bin/hdfs dfsadmin -safemode wait"
 su - cloudera -c "$HADOOP_HOME/bin/hdfs dfsadmin -safemode leave"
-echo "Creating default HDFS directory /user/cloudera..."
-su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/cloudera"
+echo "Creating default HDFS directory /user/$HADOOP_USER_NAME..."
+su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/$HADOOP_USER_NAME"
+su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chown -R $HADOOP_USER_NAME:$HADOOP_USER_NAME /user/$HADOOP_USER_NAME" || true
+su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/$HADOOP_USER_NAME"
+if [ "$HADOOP_USER_NAME" != "cloudera" ]; then
+  su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/cloudera"
+  su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/cloudera"
+fi
 echo "Creating default Hive Warehouse directory /user/hive/warehouse..."
 su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/hive/warehouse"
 su - cloudera -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /user/hive/warehouse"

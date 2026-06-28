@@ -26,7 +26,8 @@ A lightweight, containerized sandbox environment containing a fully configured B
    * **Ubuntu/Debian:** `sudo apt-get install docker.io docker-compose`
    * **Arch Linux:** `sudo pacman -S podman docker-compose slirp4netns`
 2. Start and enable the service:
-   * `sudo systemctl enable --now docker` (or `podman`)
+   * **Docker:** `sudo systemctl enable --now docker`
+   * **Podman (Rootless Compose API support):** Run `systemctl --user enable --now podman.socket` (this starts the user-space daemon socket at `/run/user/1000/podman/podman.sock` so `docker-compose` can execute container operations).
 
 ### 🍏 macOS
 1. Install **Homebrew** (if not already installed): `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
@@ -168,3 +169,10 @@ SHOW DATABASES;
 ### 3. Hadoop scheduling priority errors (`renice` blocks startup)
 * **Cause:** Containers running rootless are prohibited from changing system scheduling priorities (niceness), crashing Hadoop's default daemons on boot.
 * **Fix:** The sandbox includes a mock `renice` command located at `/usr/local/bin/renice` that catches these calls and returns success (`exit 0`), allowing daemons to boot.
+
+### 4. `failed to connect to the docker API at unix:///run/user/.../podman/podman.sock` (Compose API Failure)
+* **Cause:** `docker-compose` expects a running Docker daemon socket API. When using rootless Podman, this user-space socket is not started by default.
+* **Fix:** Start and enable Podman's rootless API socket service for your user account:
+  ```bash
+  systemctl --user enable --now podman.socket
+  ```

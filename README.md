@@ -50,7 +50,13 @@ This starts all components and automatically mounts persistent storage volumes.
 # 1. Build and start the sandbox in the background
 docker-compose up -d --build
 
-# 2. Stop the sandbox without deleting data
+# 2. Stop the sandbox without removing the container
+docker-compose stop
+
+# 3. Start the stopped sandbox container back up
+docker-compose start
+
+# 4. Stop and completely remove the container instance and its network
 docker-compose down
 ```
 
